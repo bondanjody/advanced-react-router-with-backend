@@ -17,7 +17,7 @@ const router = createBrowserRouter([
           // ...
         } else {
           const resData = await response.json();
-          return resData;
+          return resData.events;
         }
       }},
       {path: ':eventID', element: <EventDetail />},
