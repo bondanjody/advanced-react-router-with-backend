@@ -9,7 +9,7 @@ function ErrorPage() {
     let message = 'Something went wrong !';
 
     if (err.status === 500) {
-        message = JSON.parse(err.data).message;
+        message = err.data.message;
     }
 
     if (err.status === 400) {
