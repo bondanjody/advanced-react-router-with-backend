@@ -9,13 +9,25 @@ import EventsRootLayout from './pages/EventsRoot';
 import ErrorPage from './pages/Error';
 
 const router = createBrowserRouter([
-  {path: '/', element: <RootLayout />, errorElement: <ErrorPage />, children: [
+  { path: '/',
+    element: <RootLayout />, 
+    errorElement: <ErrorPage />, 
+    children: [
     {index: true, element: <Home />},
-    {path: 'events', element: <EventsRootLayout />, children: [
-      {index: true, element: <Events />, loader: eventsLoader },
-      {path: ':eventID', element: <EventDetail />, loader: eventDetailLoader},
+    { path: 'events', 
+      element: <EventsRootLayout />, 
+      children: [
+      { index: true, 
+        element: <Events />, 
+        loader: eventsLoader },
+      { path: ":eventID", 
+        id: 'event-detail',
+        loader: eventDetailLoader, 
+        children: [
+        { index: true, element: <EventDetail /> },
+        { path: 'edit', element: <EditEvent />},
+      ]},
       {path: 'new', element: <NewEvent />},
-      {path: ':eventID/edit', element: <EditEvent />},
     ]},
   ]},
 ]);
