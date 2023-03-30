@@ -3,7 +3,7 @@ import { useLoaderData, json, defer, Await } from 'react-router-dom';
 import EventsList from '../components/EventsList';
 import { Suspense } from 'react';
 
-function Events() {
+function EventsPage() {
   const {events} = useLoaderData();
   // const events = data.events;
 
@@ -21,7 +21,7 @@ function Events() {
   </Suspense>
 }
 
-export default Events;
+export default EventsPage;
 
 async function loadEvents() {
   const response = await fetch('http://localhost:8080/events');

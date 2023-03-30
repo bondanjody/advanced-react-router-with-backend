@@ -1,27 +1,70 @@
-import { Fragment } from "react";
-import { useRouteLoaderData, json, redirect } from "react-router-dom";
+import { Fragment, Suspense } from "react";
+import { useRouteLoaderData, json, redirect, defer, Await } from "react-router-dom";
 import EventItem from '../components/EventItem';
+import EventsList from '../components/EventsList';
 
-const EventDetail = () => {
-    const data = useRouteLoaderData('event-detail');
-
-    return <Fragment>
-        <EventItem event={data.event} />
-    </Fragment>;
+const EventDetailPage = () => {
+    const { event, events} = useRouteLoaderData('event-detail');
+    
+    return (
+    <Fragment>
+        <Suspense fallback={<p style={{textAlign: 'center'}}>Loading ...</p>}>
+            <Await resolve={event}>
+                {(loadedEvent) => <EventItem event={loadedEvent} />}
+            </Await>
+        </Suspense>
+        <Suspense fallback={<p style={{textAlign: 'center'}}>Loading ...</p>}>
+            <Await resolve={events}>
+                {(loadedEvents) => <EventsList events={loadedEvents} />}
+            </Await>
+        </Suspense>    
+    </Fragment>
+    );
 }
 
-export default EventDetail;
+export default EventDetailPage;
 
-export async function loader({request, params}) {
-    const id = params.eventID;
-
+async function loadEvent(id) {
     const response = await fetch('http://localhost:8080/events/' + id );
 
     if (!response.ok) {
         throw json({ message: 'Could not fetch details for selected events !'}, { status: 500});
     } else {
-        return response;
+        const resData = await response.json();
+        return resData.event;
     }
+}
+
+async function loadEvents() {
+    const response = await fetch('http://localhost:8080/events');
+    if (!response.ok) {
+      // return {
+      //   isError: true,
+      //   message: 'Could not fetch events !'
+      // }
+  
+      // throw new Response(JSON.stringify({message: 'Could not fetch events !'}), {status: 500});
+  
+      throw json({message: 'Could not fetch events !'}, {status: 500});
+    } else {
+      const resData = await response.json();
+      return resData.events;
+    }
+  
+    /*
+      NOTE :
+      Semua kode API bawaan Browser (seperti : localStorage, cookie, dll) dapat dituliskan pada loader().
+      Yang tidak bisa dituliskan pada loader() adalah kode React seperti : useState, dll.
+    */
+  }
+
+export async function loader({request, params}) {
+    const id = params.eventId;
+
+    return defer({
+        event: await loadEvent(id),
+        events: loadEvents(),
+    });
 }
 
 export async function action({params, request}) {
@@ -33,3 +76,4 @@ export async function action({params, request}) {
     }
     return redirect('/events');
 }
+
