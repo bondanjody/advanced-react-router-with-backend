@@ -60,7 +60,7 @@ export async function action({request, params}) {
   let url = 'http://localhost:8080/events';
 
   if (method === 'PATCH') {
-    const eventID = params.eventID;
+    const eventID = params.eventId;
     url = 'http://localhost:8080/events/' + eventID;
   }
 
